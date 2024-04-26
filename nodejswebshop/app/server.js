@@ -2,9 +2,8 @@ const express = require("express");
 
 const app = express();
 const userRouter = require('./routes/User');
-const loginRouter = require('./routes/login')
-const mysql2 = require('mysql2')
-const https = require('https')
+const loginRouter = require('./routes/login');
+const mysql = require('mysql2');
 
 //user route
 app.use('/user', userRouter);
@@ -14,33 +13,28 @@ app.use('/login', loginRouter);
 
 const port = 443;
 
-//Connection information
-const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'db_test'
-};
+//Create a connection to the MySQL database
+const connection = mysql.createConnection({
+    host: 'localhost', // change to your mysql server ip
+    user: 'root', //change to your mysql user
+    password: 'root', // change to your mysql user password
+    database: 'db_test', // change to your database name
+    port: 6033,
+});
 
-//Connection to the database
-const connectToDatabase = async () => {
-    try {
-        const connection = await mysql2.createConnection(dbConfig);
-        //console.log(connection)
-        return connection;
-    } catch (error) {
-        console.log('erreur lors de la connexion à la db')
+// Connect to the database
+connection.connect((err) => {
+    if (err) {
+        console.error('Error connecting to MySQL database:', err);
+        return;
     }
-}
+    console.log('Connected to MySQL database');
+});
 
-connectToDatabase()
-//console.log(connection)
-//Query
-//const query = connection.query('SELECT * FROM t_users')
-//console.log(query)
+// Perform database operations here
 
-//End the connection
-//connection.end();
+// Close the connection when done
+connection.end();
 
 //Error 404 if the URL don't exist
 app.use(({ res }) => {
@@ -49,7 +43,6 @@ app.use(({ res }) => {
 });
 
 // Démarrage du serveur
-// https.createServer(app).listen(port, () => {console.log('Server running on port', port)})
 app.listen(port, () => {
     console.log('Server running on port', port);
 });
