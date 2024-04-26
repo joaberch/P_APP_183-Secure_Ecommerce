@@ -3,7 +3,8 @@ const express = require("express");
 const app = express();
 const userRouter = require('./routes/User');
 const loginRouter = require('./routes/login');
-const mysql = require('mysql2');
+const createAccountRouter = require('./routes/createAccount');
+const database = require('./database/database');
 
 //user route
 app.use('/user', userRouter);
@@ -11,30 +12,12 @@ app.use('/user', userRouter);
 //login route
 app.use('/login', loginRouter);
 
-const port = 443;
+//create account route
+app.use('/create', createAccountRouter);
 
-//Create a connection to the MySQL database
-const connection = mysql.createConnection({
-    host: 'localhost', // change to your mysql server ip
-    user: 'root', //change to your mysql user
-    password: 'root', // change to your mysql user password
-    database: 'db_test', // change to your database name
-    port: 6033,
-});
+const port = 8080;
 
-// Connect to the database
-connection.connect((err) => {
-    if (err) {
-        console.error('Error connecting to MySQL database:', err);
-        return;
-    }
-    console.log('Connected to MySQL database');
-});
-
-// Perform database operations here
-
-// Close the connection when done
-connection.end();
+//database.connect()
 
 //Error 404 if the URL don't exist
 app.use(({ res }) => {
