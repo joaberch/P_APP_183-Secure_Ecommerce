@@ -1,12 +1,10 @@
 const express = require('express');
-const database = require('../database/database');
 
 const createAccountRouter = express.Router();
 
 createAccountRouter.post('/', (req, res) => {
-    database.connect();
-    database.createAccount();
-    console.log("a")
+    // database.connect();
+    // database.createAccount();
     return res.status(200)
 })
 
