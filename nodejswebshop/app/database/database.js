@@ -6,17 +6,6 @@ const dbConfiguration = {
     password: 'root',
 };
 
-// async function connectToDB() {
-//     try {
-//         const connection = await mysql.createConnection(dbConfiguration);
-//         console.log("Connection to the database succeeded");
-//         return connection;
-//     } catch(err) {
-//         console.log("Error during the connection to the database : " + err);
-//         throw err;
-//     }
-// };
-
 async function createDatabaseIfNotExists() {
     const connection = await mysql.createConnection(dbConfiguration);
     try {
@@ -50,7 +39,7 @@ async function createTableIfNotExists(connection) {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log("Table 'user' created");
+        console.log("Table 'user' created or was alredy created");
     } catch (error) {
         console.error("Error creating table 'user' : ", error);
     }
