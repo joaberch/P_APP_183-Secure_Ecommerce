@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+const crypt = require('crypto-js')
 
 const dbConfiguration = {
     host: 'db',
@@ -64,5 +65,28 @@ async function createTableIfNotExists(connection) {
     }
 }
 
+async function signUp(username, password) {
+    const connection = await mysql.createConnection(dbConfiguration);
+    try {
+        // Select the database 'db_secure_shop'
+        await connection.promise().query("USE db_secure_shop");
 
-module.exports = { createDatabaseIfNotExists, checkIfUserExist };
+        //Check if the username is not already taken
+        const [rows] = await connection.promise().query(`SELECT * FROM user WHERE username = '${username}'`);
+        if (rows.length === 0) {
+            let salt = crypto.randomUUID(16);
+            let hashedPassword = crypt.SHA256(username + salt);
+
+            //insert in the database
+            await connection.promise().query(`INSERT INTO user (username, password_hash, salt) VALUES ('${username}', '${hashedPassword}', '${salt}')`);
+            console.log("User has been created")
+        } else {
+            console.log("username is already taken")
+        }
+
+    } catch (error) {
+        console.log("error : " + error)
+    }
+}
+
+module.exports = { createDatabaseIfNotExists, checkIfUserExist, signUp };

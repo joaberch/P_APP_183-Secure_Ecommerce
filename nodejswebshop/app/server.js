@@ -5,6 +5,7 @@ const port = 8080;
 
 const userRoute = require('./routes/User');
 const loginRouter = require('./routes/Login');
+const signUpRouter = require('./routes/signUp')
 
 const { createDatabaseIfNotExists } = require('./database/database');
 
@@ -15,6 +16,7 @@ app.use(express.json());
 //Route
 app.use('/user', userRoute);
 app.use('/login', loginRouter);
+app.use('/signUp', signUpRouter);
 
 createDatabaseIfNotExists();
 
