@@ -21,8 +21,7 @@ async function checkIfUserExist(username) {
 
             const [queryResult, u] = await connection.promise().query(`SELECT salt FROM user WHERE username = '${username}'`);
             const salt = queryResult[0].salt;
-
-            const hashedPassword = crypt.SHA256(username + salt[0]);
+            const hashedPassword = crypt.SHA256(username + salt);
             console.log(hashedPassword)
 
             const [rows] = await connection.promise().query(`SELECT * FROM user WHERE password_hash = '${hashedPassword}'`);
@@ -87,7 +86,7 @@ async function signUp(username, password) {
         if (rows.length === 0) {
             let salt = crypto.randomUUID(16);
             let hashedPassword = crypt.SHA256(username + salt);
-            console.log(hashedPassword)
+
             //insert in the database
             await connection.promise().query(`INSERT INTO user (username, password_hash, salt) VALUES ('${username}', '${hashedPassword}', '${salt}')`);
             console.log("User has been created")
