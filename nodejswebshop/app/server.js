@@ -9,7 +9,8 @@ const loginRouter = require('./routes/Login');
 const { createDatabaseIfNotExists } = require('./database/database');
 
 //Middleware to get the body of POST request
-app.use(express.urlencoded({ extended: true }));
+//app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 //Route
 app.use('/user', userRoute);

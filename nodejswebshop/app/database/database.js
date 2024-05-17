@@ -6,6 +6,25 @@ const dbConfiguration = {
     password: 'root',
 };
 
+async function checkIfUserExist(username) {
+    const connection = await mysql.createConnection(dbConfiguration);
+    try {
+        // Select the database 'db_secure_shop'
+        await connection.promise().query("USE db_secure_shop");
+
+        const [rows] = await connection.promise().query(`SELECT * FROM user WHERE username = '${username}'`);
+        if (rows.length === 0) {
+            console.log("username or password invalid")
+        } else {
+            console.log("This username exist")
+            const salt = await connection.promise().query(`SELECT salt FROM user WHERE username = '${username}'`);
+            console.log(salt)
+        }
+    } catch (error) {
+        console.log("error : " + error)
+    }
+}
+
 async function createDatabaseIfNotExists() {
     const connection = await mysql.createConnection(dbConfiguration);
     try {
@@ -39,11 +58,11 @@ async function createTableIfNotExists(connection) {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log("Table 'user' created or was alredy created");
+        console.log("Table 'user' created or alredy exist");
     } catch (error) {
         console.error("Error creating table 'user' : ", error);
     }
 }
 
 
-module.exports = { createDatabaseIfNotExists };
+module.exports = { createDatabaseIfNotExists, checkIfUserExist };
