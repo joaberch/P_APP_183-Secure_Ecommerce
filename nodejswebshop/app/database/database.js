@@ -1,5 +1,5 @@
 const mysql = require('mysql2');
-const crypt = require('crypto-js')
+const cryptoJs = require('crypto-js')
 
 //value required to connect to the database
 const dbConfiguration = {
@@ -26,7 +26,7 @@ async function checkIfUserExist(username) {
 
             const [queryResult, u] = await connection.promise().query(`SELECT salt FROM user WHERE username = '${username}'`);
             const salt = queryResult[0].salt;
-            const hashedPassword = crypt.SHA256(username + salt);
+            const hashedPassword = cryptoJs.SHA256(username + salt);
 
             const [rows] = await connection.promise().query(`SELECT * FROM user WHERE password_hash = '${hashedPassword}'`);
             if (rows.length === 0) {
@@ -92,7 +92,7 @@ async function signUp(username, password) {
         const [rows] = await connection.promise().query(`SELECT * FROM user WHERE username = '${username}'`);
         if (rows.length === 0) {
             let salt = crypto.randomUUID(16);
-            let hashedPassword = crypt.SHA256(username + salt);
+            let hashedPassword = cryptoJs.SHA256(username + salt);
 
             //insert in the database
             await connection.promise().query(`INSERT INTO user (username, password_hash, salt) VALUES ('${username}', '${hashedPassword}', '${salt}')`);
