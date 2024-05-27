@@ -5,10 +5,10 @@ const loginRouter = express.Router();
 const {checkIfUserExist} = require('../database/database')
 
 loginRouter.post('/', (req, res) => {
-    const {username} = req.body;
+    const {username, password} = req.body;
 
     //Check if the username is in the database
-    if(checkIfUserExist(username)) //TODO - connection.execute
+    if(checkIfUserExist(username, password)) //TODO - connection.execute
         {
             console.log("give JWT token")
             //TODO - generate JWT token

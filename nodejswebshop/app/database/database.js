@@ -9,7 +9,7 @@ const dbConfiguration = {
 };
 
 //Check if the user exist in the database
-async function checkIfUserExist(username) {
+async function checkIfUserExist(username, password) {
     //Create the connection
     const connection = await mysql.createConnection(dbConfiguration);
     try {
@@ -19,21 +19,19 @@ async function checkIfUserExist(username) {
         //Check if the username already exist
         const [rows] = await connection.promise().query(`SELECT * FROM user WHERE username = '${username}'`);
         if (rows.length === 0) {
-            console.log("username doesn't exist")
+            console.log("password or username incorrect")
             return false;
         } else {
-            console.log("This username exist")
 
             const [queryResult, u] = await connection.promise().query(`SELECT salt FROM user WHERE username = '${username}'`);
             const salt = queryResult[0].salt;
-            const hashedPassword = cryptoJs.SHA256(username + salt);
+            const hashedPassword = cryptoJs.SHA256(username + password + salt);
 
             const [rows] = await connection.promise().query(`SELECT * FROM user WHERE password_hash = '${hashedPassword}'`);
             if (rows.length === 0) {
-                console.log("wrong password or username")
+                console.log("password or username incorrect")
                 return false;
             } else {
-                console.log("correct password")
                 return true;
             }
         }
@@ -76,7 +74,7 @@ async function createTableIfNotExists(connection) {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log("Table 'user' created or alredy exist");
+        console.log("Table 'user' created or already exist");
     } catch (error) {
         console.error("Error creating table 'user' : ", error);
     }
@@ -92,7 +90,7 @@ async function signUp(username, password) {
         const [rows] = await connection.promise().query(`SELECT * FROM user WHERE username = '${username}'`);
         if (rows.length === 0) {
             let salt = crypto.randomUUID(16);
-            let hashedPassword = cryptoJs.SHA256(username + salt);
+            let hashedPassword = cryptoJs.SHA256(username + password + salt);
 
             //insert in the database
             await connection.promise().query(`INSERT INTO user (username, password_hash, salt) VALUES ('${username}', '${hashedPassword}', '${salt}')`);
