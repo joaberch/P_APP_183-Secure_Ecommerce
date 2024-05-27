@@ -1,11 +1,12 @@
 const mysql = require('mysql2');
-const cryptoJs = require('crypto-js')
+const cryptoJs = require('crypto-js');
 
 //value required to connect to the database
 const dbConfiguration = {
     host: 'db',
     user: 'root',
     password: 'root',
+    database: 'db_secure_shop',
 };
 
 //Check if the user exist in the database
@@ -13,22 +14,19 @@ async function checkIfUserExist(username, password) {
     //Create the connection
     const connection = await mysql.createConnection(dbConfiguration);
     try {
-        // Select the database 'db_secure_shop'
-        await connection.promise().query("USE db_secure_shop");
-
         //Check if the username already exist
-        const [rows] = await connection.promise().query(`SELECT * FROM user WHERE username = '${username}'`);
+        const [rows] = await connection.promise().execute(`SELECT * FROM user WHERE username = ?`, [username]);
         if (rows.length === 0) {
             console.log("password or username incorrect")
             return false;
         } else {
 
-            const [queryResult, u] = await connection.promise().query(`SELECT salt FROM user WHERE username = '${username}'`);
-            const salt = queryResult[0].salt;
-            const hashedPassword = cryptoJs.SHA256(username + password + salt);
+            const [result, u] = await connection.promise().execute(`SELECT salt FROM user WHERE username = ?`, [username]);
+            const salt = result[0].salt;
+            const hashedPassword = cryptoJs.SHA256(username + password + salt).toString();
 
-            const [rows] = await connection.promise().query(`SELECT * FROM user WHERE password_hash = '${hashedPassword}'`);
-            if (rows.length === 0) {
+            const [passwordRows] = await connection.promise().execute(`SELECT * FROM user WHERE password_hash = ?`, [hashedPassword]);
+            if (passwordRows.length === 0) {
                 return false;
             } else {
                 return true;
