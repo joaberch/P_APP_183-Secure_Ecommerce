@@ -29,7 +29,6 @@ async function checkIfUserExist(username, password) {
 
             const [rows] = await connection.promise().query(`SELECT * FROM user WHERE password_hash = '${hashedPassword}'`);
             if (rows.length === 0) {
-                console.log("password or username incorrect")
                 return false;
             } else {
                 return true;

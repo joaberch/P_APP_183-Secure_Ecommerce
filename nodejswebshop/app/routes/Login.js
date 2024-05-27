@@ -2,22 +2,26 @@ const express = require('express');
 
 const loginRouter = express.Router();
 
-const {checkIfUserExist} = require('../database/database')
+const { checkIfUserExist } = require('../database/database')
 
 loginRouter.post('/', (req, res) => {
-    const {username, password} = req.body;
+    const { username, password } = req.body;
 
-    //Check if the username is in the database
-    if(checkIfUserExist(username, password)) //TODO - connection.execute
-        {
-            console.log("give JWT token")
-            //TODO - generate JWT token
-        } else {
-            console.log("error")
-        }
+    giveJWTToken(username, password);
 
     //end
     //res.redirect(`/user/${username}`)
 })
+
+async function giveJWTToken(username, password) {
+    //Check if the username is in the database
+    if (await checkIfUserExist(username, password)) //TODO - connection.execute
+    {
+        console.log("give JWT token")
+        //TODO - generate JWT token
+    } else {
+        console.log("username or password incorrect")
+    }
+}
 
 module.exports = loginRouter; 
