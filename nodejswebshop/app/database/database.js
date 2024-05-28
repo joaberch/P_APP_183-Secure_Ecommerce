@@ -1,5 +1,6 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const cryptoJs = require('crypto-js');
+const crypto = require('crypto');
 
 //value required to connect to the database
 const dbConfiguration = {
@@ -15,17 +16,16 @@ async function checkIfUserExist(username, password) {
     const connection = await mysql.createConnection(dbConfiguration);
     try {
         //Check if the username already exist
-        const [rows] = await connection.promise().execute(`SELECT * FROM user WHERE username = ?`, [username]);
+        const [rows] = await connection.execute(`SELECT * FROM user WHERE username = ?`, [username]);
         if (rows.length === 0) {
-            console.log("password or username incorrect")
             return false;
         } else {
 
-            const [result, u] = await connection.promise().execute(`SELECT salt FROM user WHERE username = ?`, [username]);
+            const [result, u] = await connection.execute(`SELECT salt FROM user WHERE username = ?`, [username]);
             const salt = result[0].salt;
             const hashedPassword = cryptoJs.SHA256(username + password + salt).toString();
 
-            const [passwordRows] = await connection.promise().execute(`SELECT * FROM user WHERE password_hash = ?`, [hashedPassword]);
+            const [passwordRows] = await connection.execute(`SELECT * FROM user WHERE password_hash = ?`, [hashedPassword]);
             if (passwordRows.length === 0) {
                 return false;
             } else {
@@ -42,10 +42,10 @@ async function createDatabaseIfNotExists() {
     const connection = await mysql.createConnection(dbConfiguration);
     try {
         // check if the database 'db_secure_shop' exist
-        const [rows] = await connection.promise().query("SHOW DATABASES LIKE 'db_secure_shop'");
+        const [rows] = await connection.execute("SHOW DATABASES LIKE 'db_secure_shop'");
         if (rows.length === 0) {
             // If the database doesn't exist
-            await connection.promise().query("CREATE DATABASE db_secure_shop");
+            await connection.execute("CREATE DATABASE db_secure_shop");
             console.log("Database 'db_secure_shop' created");
         } else {
             //If the database exists
@@ -60,10 +60,8 @@ async function createDatabaseIfNotExists() {
 
 async function createTableIfNotExists(connection) {
     try {
-        // Select the database 'db_secure_shop'
-        await connection.promise().query("USE db_secure_shop");
         // Create the table 'user' if it doesn't already exist
-        await connection.promise().query(`CREATE TABLE IF NOT EXISTS user (
+        await connection.execute(`CREATE TABLE IF NOT EXISTS user (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(50) UNIQUE NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
@@ -80,17 +78,14 @@ async function createTableIfNotExists(connection) {
 async function signUp(username, password) {
     const connection = await mysql.createConnection(dbConfiguration);
     try {
-        // Select the database 'db_secure_shop'
-        await connection.promise().query("USE db_secure_shop");
-
         //Check if the username is not already taken
-        const [rows] = await connection.promise().query(`SELECT * FROM user WHERE username = '${username}'`);
+        const [rows] = await connection.execute(`SELECT * FROM user WHERE username = ?`, [username]);
         if (rows.length === 0) {
-            let salt = crypto.randomUUID(16);
+            let salt = crypto.randomBytes(16).toString('hex');
             let hashedPassword = cryptoJs.SHA256(username + password + salt);
 
             //insert in the database
-            await connection.promise().query(`INSERT INTO user (username, password_hash, salt) VALUES ('${username}', '${hashedPassword}', '${salt}')`);
+            await connection.execute(`INSERT INTO user (username, password_hash, salt) VALUES (?, ?, ?)`, [username, hashedPassword, salt]);
             console.log("User has been created")
         } else {
             console.log("username is already taken")
