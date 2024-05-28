@@ -82,7 +82,7 @@ async function signUp(username, password) {
         const [rows] = await connection.execute(`SELECT * FROM user WHERE username = ?`, [username]);
         if (rows.length === 0) {
             let salt = crypto.randomBytes(16).toString('hex');
-            let hashedPassword = cryptoJs.SHA256(username + password + salt);
+            let hashedPassword = cryptoJs.SHA256(username + password + salt).toString(cryptoJs.enc.Hex);
 
             //insert in the database
             await connection.execute(`INSERT INTO user (username, password_hash, salt) VALUES (?, ?, ?)`, [username, hashedPassword, salt]);
