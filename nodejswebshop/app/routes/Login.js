@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 
 const loginRouter = express.Router();
 
@@ -8,7 +9,6 @@ loginRouter.post('/', (req, res) => {
     const { username, password } = req.body;
 
     giveJWTToken(username, password);
-
     //end
     //res.redirect(`/user/${username}`)
 })
@@ -18,6 +18,8 @@ async function giveJWTToken(username, password) {
     if (await checkIfUserExist(username, password)) //TODO - connection.execute
     {
         console.log("give JWT token")
+        let token = jwt.sign({username: username}, "secretKey");
+        console.log(token)
         //TODO - generate JWT token
     } else {
         console.log("username or password incorrect")
