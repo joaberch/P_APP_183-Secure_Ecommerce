@@ -8,6 +8,7 @@ signUpRouter.post('/', (req, res) => {
     const {username, password} = req.body;
     signUp(username, password);
 
+    res.status(200).send('user created successfully');
     //end
     //res.redirect(`/user/${username}`)
 })
