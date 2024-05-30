@@ -1,5 +1,6 @@
 module.exports = {
     get: (req, res) => {
-        res.send("User: Sarah");
+        const username = req.params.user;
+        res.send(`User: ${username}`);
     }
 };
