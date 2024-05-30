@@ -1,6 +1,5 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
 
 const loginRouter = express.Router();
 
@@ -21,7 +20,7 @@ async function giveJWTToken(req, res, username, password) {
         let token = jwt.sign({ username: username }, "secretKey", { expiresIn: '1h' });
 
         res.cookie('jwt', token, { httpOnly: true, secure: true });
-        res.status(200).send('JWT token generated and stored in cookie');
+        res.status(200).send('JWT token generated and stored in cookie, ' + token);
     } else {
         console.log("username or password incorrect")
     }
