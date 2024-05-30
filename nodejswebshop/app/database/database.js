@@ -10,6 +10,16 @@ const dbConfiguration = {
     database: 'db_secure_shop',
 };
 
+async function getUsername(username) {
+    const connection = await mysql.createConnection(dbConfiguration);
+
+    const getUsernameQuery = `SELECT * FROM user WHERE username = ?`;
+    
+    const userData = await connection.execute(getUsernameQuery, [username]);
+    const specificUserdata = userData[0][0];
+    return specificUserdata;
+}
+
 //Check if the user exist in the database
 async function checkIfUserExist(username, password) {
     //Create the connection
@@ -96,4 +106,4 @@ async function signUp(username, password) {
     }
 }
 
-module.exports = { createDatabaseIfNotExists, checkIfUserExist, signUp };
+module.exports = { createDatabaseIfNotExists, checkIfUserExist, signUp, getUsername };
