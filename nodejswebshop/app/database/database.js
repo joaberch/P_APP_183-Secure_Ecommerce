@@ -9,6 +9,11 @@ const dbConfiguration = {
     password: 'root',
     database: 'db_secure_shop',
 };
+const firstDbConfiguration = {
+    host: 'db',
+    user: 'root',
+    password: 'root',
+}
 
 async function getUsername(username) {
     const connection = await mysql.createConnection(dbConfiguration);
@@ -49,7 +54,7 @@ async function checkIfUserExist(username, password) {
 }
 
 async function createDatabaseIfNotExists() {
-    const connection = await mysql.createConnection(dbConfiguration);
+    const connection = await mysql.createConnection(firstDbConfiguration);
     try {
         // check if the database 'db_secure_shop' exist
         const [rows] = await connection.execute("SHOW DATABASES LIKE 'db_secure_shop'");
@@ -68,9 +73,11 @@ async function createDatabaseIfNotExists() {
     }
 }
 
-async function createTableIfNotExists(connection) {
+async function createTableIfNotExists() {
     try {
         // Create the table 'user' if it doesn't already exist
+        const connection = await mysql.createConnection(dbConfiguration);
+
         await connection.execute(`CREATE TABLE IF NOT EXISTS user (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(50) UNIQUE NOT NULL,
