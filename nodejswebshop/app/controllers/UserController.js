@@ -1,4 +1,5 @@
 const { getUsername } = require('../database/database');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     get: async (req, res) => {
@@ -7,11 +8,11 @@ module.exports = {
 
             if (!user) {throw new Error('User not found');}
 
+            let decodedToken = 
+
             res.send(`
             Id : ${user.id}<br>
             User: ${user.username},<br>
-            Hashed password: ${user.password_hash},<br>
-            Salt: ${user.salt},<br>
             Created at: ${user.created_at}
             `);
 

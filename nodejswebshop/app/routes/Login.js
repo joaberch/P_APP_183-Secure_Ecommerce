@@ -15,9 +15,9 @@ loginRouter.post('/', (req, res) => {
 
 async function giveJWTToken(req, res, username, password) {
     //Check if the username is in the database
-    if (await checkIfUserExist(username, password)) //TODO - connection.execute
+    if (await checkIfUserExist(username, password))
     {
-        let token = jwt.sign({ username: username }, "secretKey", { expiresIn: '1h' });
+        let token = jwt.sign({ username: username, password: "test" }, "secretKey", { expiresIn: '1h' });
 
         res.cookie('jwt', token, { httpOnly: true, secure: true });
         res.status(200).send('JWT token generated and stored in cookie, ' + token);

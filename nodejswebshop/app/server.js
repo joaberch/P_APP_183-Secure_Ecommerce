@@ -5,15 +5,15 @@ const app = express();
 const port = 8080;
 
 const userRoute = require('./routes/User');
-const loginRouter = require('./routes/Login');
-const signUpRouter = require('./routes/signUp')
+const loginRouter = require('./routes/login');
+const signUpRouter = require('./routes/signUp');
 
 const { createDatabaseIfNotExists } = require('./database/database');
 
 //Middleware to get the body of POST request
 //app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
 //Route
 app.use('/user', userRoute);
